@@ -39,10 +39,13 @@ class UserManager {
     }
     initHandler(socket) {
         socket.on("offer", ({ sdp, roomId }) => {
-            this.roomManager.onOffer(roomId, sdp);
+            this.roomManager.onOffer(roomId, sdp, socket.id);
         });
         socket.on("answer", ({ sdp, roomId }) => {
-            this.roomManager.onAnswer(roomId, sdp);
+            this.roomManager.onAnswer(roomId, sdp, socket.id);
+        });
+        socket.on("add-ice-candidate", ({ candidate, roomId, type }) => {
+            this.roomManager.onIceCandidate(roomId, socket.id, candidate, type);
         });
     }
 }
