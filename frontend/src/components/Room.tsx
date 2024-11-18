@@ -48,7 +48,8 @@ export default function Room({
                 if(e.candidate){
                     socket.emit("add-ice-candidate", {
                         candidate : e.candidate,
-                        type : "sender"
+                        type : "sender",
+                        roomId
                     })
                 }
             }
@@ -57,7 +58,7 @@ export default function Room({
                 
                 pc.setLocalDescription(sdp)
                 socket.emit("offer", {
-                    sdp : "",
+                    sdp : sdp,
                     roomId
                 })
             }
@@ -70,7 +71,7 @@ export default function Room({
             pc.setRemoteDescription(remoteSdp)
             const sdp = await pc.createAnswer()
             
-            pc.setLocalDescription(sdp)
+            await pc.setLocalDescription(sdp)
             const stream = new MediaStream()
             if(remoteVideoRef.current){
                 remoteVideoRef.current.srcObject = stream
@@ -80,15 +81,21 @@ export default function Room({
             setReceivingPc(pc)
 
             pc.onicecandidate = async (e)=>{
+                if(!e.candidate){
+                    return
+                }
                 if(e.candidate){
                     socket.emit("add-ice-candidate", {
                         candidate : e.candidate,
-                        type : "receiver"
+                        type : "receiver",
+                        roomId
+                        
                     })
                 }
             }
 
-            pc.ontrack=(({track, type})=>{
+            pc.ontrack=((e)=>{
+                const {track, type} = e
                 if(type === 'audio'){
                     // setRemoteAudioTrack(track)
                    // @ts-ignore
@@ -119,6 +126,7 @@ export default function Room({
                     type: "answer",
                     sdp : remoteSdp
                 })
+                
                 return pc
             })
             alert("connection done")
@@ -136,7 +144,7 @@ export default function Room({
                 })
             }
             else{
-                setReceivingPc(pc => {
+                setSendingPc(pc => {
                     pc?.addIceCandidate(candidate)
                     return pc
             })
