@@ -93,28 +93,37 @@ export default function Room({
                     })
                 }
             }
-
-            pc.ontrack=((e)=>{
-                const {track, type} = e
-                if(type === 'audio'){
-                    // setRemoteAudioTrack(track)
-                   // @ts-ignore
-                    remoteVideoRef.current.srcObject.addTrack(track)
-                } else{
-                    // setRemoteVideoTrack(track)
-                    // @ts-ignore
-
-                    remoteVideoRef.current.srcObject.addTrack(track)
-
-                }
-                //@ts-ignore
-                remoteVideoRef.current.play()
-            })
+            setRemoteMediaStream(stream)
+            setReceivingPc(pc)
+            window.pcr = pc
+            pc.ontrack=(e)=>{
+               
+            }
 
             socket.emit("answer" , {
                 roomId,
                 sdp : sdp
             })
+            setTimeout(()=>{
+               const track1 =  pc.getTransceivers()[0].receiver.track
+               const track2 =  pc.getTransceivers()[1].receiver.track
+
+              if(track1.kind === "video"){
+                setRemoteAudioTrack(track2)
+                setRemoteVideoTrack(track1)
+              } else{
+                setRemoteAudioTrack(track1)
+                setRemoteVideoTrack(track2)
+              }
+              //@ts-ignore
+              remoteVideoRef.current?.srcObject.addTrack(track1)
+            //@ts-ignore
+
+              remoteVideoRef.current?.srcObject.addTrack(track2)
+            //@ts-ignore
+
+              remoteVideoRef.current.play()
+            }, 5000)
         })
 
     
@@ -122,10 +131,9 @@ export default function Room({
         socket.on("answer", ({roomId, sdp : remoteSdp})=>{
             setLobby(false)
             setSendingPc(pc => {
-                pc?.setRemoteDescription({
-                    type: "answer",
-                    sdp : remoteSdp
-                })
+                pc?.setRemoteDescription(
+                    remoteSdp
+                )
                 
                 return pc
             })
