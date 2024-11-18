@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom"
 import { Socket, io } from "socket.io-client"
 import { useRef } from "react"
 
-const URL = "http://localhost:3000"
+const URL = "https://13.201.128.49/"
 export default function Room({
     name,
     localAudioTrack,
