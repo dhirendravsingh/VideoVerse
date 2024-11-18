@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom"
 import { Socket, io } from "socket.io-client"
 import { useRef } from "react"
 
-const URL = "https://13.201.128.49/"
+const URL = "http://localhost:3000/"
 export default function Room({
     name,
     localAudioTrack,
@@ -23,8 +23,8 @@ export default function Room({
     const [remoteVideoTrack, setRemoteVideoTrack] = useState<MediaStreamTrack | null>(null)
     const [remoteAudioTrack, setRemoteAudioTrack] = useState<MediaStreamTrack | null>(null)
     const [remoteMediaStream , setRemoteMediaStream] = useState<MediaStream | null>(null)
-    const remoteVideoRef = useRef<HTMLVideoElement>()
-    const localVideoRef = useRef<HTMLVideoElement>()
+    const remoteVideoRef = useRef<HTMLVideoElement | null>(null)
+    const localVideoRef = useRef<HTMLVideoElement | null>(null)
 
 
 
@@ -175,6 +175,7 @@ export default function Room({
 
     return <div>
             Hi {name}
+            
             <video autoPlay width={400} height={400} ref={localVideoRef}/>
             <video autoPlay width={400} height={400} ref={remoteVideoRef}/>
     </div>
