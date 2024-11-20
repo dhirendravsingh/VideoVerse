@@ -3,6 +3,7 @@ import express from 'express'
 import http from 'http'
 import { Server } from "socket.io"
 import { UserManager } from "./managers/UserManager"
+import cors from 'cors';
 
 
 const app = express()
